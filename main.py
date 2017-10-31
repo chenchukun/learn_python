@@ -36,6 +36,12 @@ def testBase():
 
 def testControl():
     print('-------------testControl-------------')
+    l1 = [1, 2, 3]
+    l2 = l1
+    l3 = l1.copy()
+    print(l1 == l3 and l1 == l2)    # 测试相等性，会递归的比较每个元素
+    print(l1 is l2)
+    print(l1 is l3)     # 测试对象的一致性，也就是两者是否是同一个对象，即在同一内存中
     words = ['cat', 'window', 'defenestrate']
     print(words)
     # 若要在遍历列表的过程中添加或删除元素，可以使用切片对原序列进行拷贝
@@ -109,8 +115,22 @@ def testDataStruct():
     print(l.count(5))
     l.sort(key=None, reverse=True)
     print(l)
-    # 返回l的浅副本，相当于l[:]
+    l = [1, 2, 3, [0, 0], (1, 1)]
+    print(l)
+    # copy()返回l的浅副本,相当于对列表的每个元素赋值给新列表的每个元素，若元素为可变类型，修改该元素后会修改原有列表的值
     l2 = l.copy()
+    import copy
+    # copy模块的deepcopy()元对象进行深拷贝，递归的拷贝每一个元素
+    l3 = copy.deepcopy(l)
+    l2[0] = 2
+    l2[3].append(2)     # l 和 l2 都变了
+    print(l)
+    print(l2)
+    print(l3)
+    l2[3] = [1, 1]      # l2变了，l不变
+    print(l)
+    print(l2)
+    print(l3)
 
     # 双端队列
     q = deque(range(10))
@@ -123,6 +143,7 @@ def testDataStruct():
     q.popleft()
     print(q)
 
+    # 列表推导比循环更加高效，python使用C语言实现列表推导
     # 列表推导式的每个for都可以有一个if子句
     l = [(x, y) for x in range(10) if x%2==0 for y in range(10) if y%2==1]
     print(l)
@@ -183,6 +204,10 @@ def testDataStruct():
     print(s)
     # set不支持存储可变类型，因为hash不能操作内置的可变类型
     #s = set([[1, 2], [3, 4]])
+
+    # frozenset 不可变集合，元素确定后就不可变，可以作为dict的key或set的元素
+    fs = frozenset(range(10))
+    print(fs)
 
     # dict的构造函数可以接受一个元组列表
     d = dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
@@ -385,6 +410,35 @@ def testClass():
     print(Test.i)
     print(test1.i)
     print(test2.i)
+    print('')
+
+def testIterator():
+    print('-------------testIterator-------------')
+    # 可迭代对象一般指支持iter的对象，迭代器一般指iter返回的一个支持__next__()的对象。
+    # 通过调用__next__()来获取每个元素，直到发生StopIteration异常
+    class Iter(object):
+        def __init__(self):
+            self._index = 0
+        def __iter__(self):
+            return self
+        def __next__(self):
+            if self._index >= 10:
+                raise StopIteration
+            self._index += 1
+            return self._index
+    for index in Iter():
+        print(index)
+    # in 也使用了迭代协议
+    print( 1 in Iter())
+    # 不适用for循环而进行手动迭代
+    l = [1, 2, 3]
+    it = iter(l)    # 列表和很多内置类型，都不是自身迭代器，需要使用iter()转为迭代器
+    while True:
+        try:
+            i = next(it)
+        except StopIteration:
+            break
+        print(i)
 
 
 if __name__ == '__main__':
@@ -396,3 +450,4 @@ if __name__ == '__main__':
     testException()
     testClass()
     print(spam)
+    testIterator()
