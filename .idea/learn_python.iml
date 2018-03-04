@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/LoginSystem/template" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/LoginSystem/static" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/LoginSystem/static/css" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/LoginSystem/static/js" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

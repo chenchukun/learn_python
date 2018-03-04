@@ -1,0 +1,27 @@
+
+DROP DATABASE IF EXISTS search_system;
+
+CREATE DATABASE search_system;
+
+use search_system;
+
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  uid VARCHAR(48) PRIMARY KEY,
+  username VARCHAR(20) NOT NULL,
+  register_time DATETIME NOT NULL,
+  sex ENUM('男', '女') DEFAULT '男',
+  birth DATE DEFAULT NULL,
+  location VARCHAR (48) DEFAULT '火星',
+  last_login_time DATETIME DEFAULT NULL,
+  headimgurl VARCHAR(128) DEFAULT NULL,
+  status INT DEFAULT 0 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
+DROP TABLE IF EXISTS email_auth;
+CREATE TABLE email_auth (
+  email VARCHAR(48) PRIMARY KEY,
+  uid VARCHAR(48) NOT NULL UNIQUE KEY,
+  password VARCHAR(128) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;

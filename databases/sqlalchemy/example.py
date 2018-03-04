@@ -66,7 +66,7 @@ session.add(user)
 user = session.query(User).filter(User.uid == '7377').one()
 print(user)
 
-user = session.query(User).filter(User.uid == 'jjjjjf').all()
+user = session.query(User).filter(User.uid == 'jjjjjf').first()
 print(user)
 
 session.commit()
