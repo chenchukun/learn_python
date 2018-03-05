@@ -23,9 +23,24 @@ $('#search').on('click', function () {
     });
 });
 
+$('#push').on('click', function () {
+    var message = $('#message').val();
+    $.post('api/push', data = {'message': message}, function (data) {
+        var obj = JSON.parse(data);
+        console.log(obj);
+        $.Prompt(obj.retmsg);
+    });
+});
+
 var ws = new WebSocket('ws://' + window.location.host + '/push');
 ws.onmessage = function(e) {
     console.log(e.data);
+    if (e.data === 'heartbeat') {
+        console.log(e.data);
+    }
+    else {
+        $('#output').text(e.data);
+    }
 }
 
 function heartbeat() {

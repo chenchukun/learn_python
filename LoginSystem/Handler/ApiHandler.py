@@ -10,10 +10,11 @@ import logging
 import uuid
 import time
 from com import Jwt
+from Handler.PushHandler import PushHandler
 
 
 class ApiHandler(RequestHandler):
-    postReqs = {'login', 'register'}
+    postReqs = {'login', 'register', 'push'}
     getReqs = {'search'}
 
     Session = scoped_session(DBSession)
@@ -62,6 +63,7 @@ class ApiHandler(RequestHandler):
         now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         email = self.get_argument('email').strip()
         password = self.get_argument('password').strip()
+        logging.info('login request: email = {}, password = {} from {}'.format(email, password, self.request.remote_ip))
         self.__loginCheck(email, password)
         session = self.Session()
         auth = session.query(EmaliAuth).filter(EmaliAuth.email==email).first()
@@ -77,6 +79,7 @@ class ApiHandler(RequestHandler):
         token = Jwt.genToken(86400, info)
         info['token'] = token
         self.set_cookie('token', token)
+        logging.info('{} login success: uid = {}, username = {}'.format(email, user.uid, user.username))
         return {'retcode': 0, 'retmsg': '登录成功', 'info': info}
 
 
@@ -84,8 +87,8 @@ class ApiHandler(RequestHandler):
         username = self.get_argument('username').strip()
         email = self.get_argument('email').strip()
         password = self.get_argument('password').strip()
+        logging.info('register request: email = {}, username = {}, password = {} from {}'.format(email, username, password, self.request.remote_ip))
         self.__registerCheck(username, email, password)
-
         hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         uid = str(uuid.uuid1())
         now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -94,6 +97,7 @@ class ApiHandler(RequestHandler):
         with self.__getSession() as session:
             session.add(user)
             session.add(auth)
+        logging.info('{} register success: uid = {}, username = {}'.format(email, uid, username))
         return {'retcode': 0, 'retmsg': '注册成功，请登录', 'info': {'email': email, 'uid': uid, 'username': username}}
 
     def __registerCheck(self, username, email, password):
@@ -115,8 +119,22 @@ class ApiHandler(RequestHandler):
             raise Exception('密码不合法')
 
     def search(self):
+        logging.info('search request from {}'.format(self.request.remote_ip))
         token = self.get_cookie('token')
         info = Jwt.parseToken(token)
+        keyword = self.get_argument('keyword')
+        logging.info('search success: uid = {}, keyword = {}'.format(info['uid'], keyword))
         return {'retcode': 0, 'retmsg': '查询成功', 'data': '测试数据......'}
 
-
+    def push(self):
+        logging.info('push request from {}'.format(self.request.remote_ip))
+        token = self.get_cookie('token')
+        info = Jwt.parseToken(token)
+        if info['username'] != 'admin':
+            raise Exception('没有权限')
+        message = self.get_argument('message')
+        logging.info('push {}'.format(message))
+        for user in PushHandler.users:
+            logging.info('push \'{}\' to [{}]'.format(message, user.request.remote_ip))
+            user.write_message(message)
+        return {'retcode': 0, 'retmsg': '消息推送成功', 'data': {'recv_num': len(PushHandler.users)}}
