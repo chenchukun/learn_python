@@ -11,6 +11,9 @@ import uuid
 import time
 from com import Jwt
 from Handler.PushHandler import PushHandler
+from tornado.web import asynchronous
+from tornado.concurrent import run_on_executor
+from concurrent.futures import ThreadPoolExecutor
 
 
 class ApiHandler(RequestHandler):
@@ -18,6 +21,8 @@ class ApiHandler(RequestHandler):
     getReqs = {'search'}
 
     Session = scoped_session(DBSession)
+
+    executor = ThreadPoolExecutor(4)
 
     userNameRe = '[a-zA-z]\\w{0,9}'
     emailRe = '^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}$'
@@ -33,6 +38,7 @@ class ApiHandler(RequestHandler):
             session.rollback()
             raise
 
+    @asynchronous
     def post(self, req):
         if req not in self.postReqs:
             self.set_status(404)
@@ -40,6 +46,7 @@ class ApiHandler(RequestHandler):
         else:
             self.__handler(req)
 
+    @asynchronous
     def get(self, req):
         if req not in self.getReqs:
             self.set_status(404)
@@ -47,6 +54,7 @@ class ApiHandler(RequestHandler):
         else:
             self.__handler(req)
 
+    @run_on_executor
     def __handler(self, req):
         try:
             info = getattr(self, req)()
@@ -58,6 +66,8 @@ class ApiHandler(RequestHandler):
             }
             self.write(json.dumps(retJson))
             logging.exception(e)
+        finally:
+            self.finish()
 
     def login(self):
         now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -65,16 +75,17 @@ class ApiHandler(RequestHandler):
         password = self.get_argument('password').strip()
         logging.info('login request: email = {}, password = {} from {}'.format(email, password, self.request.remote_ip))
         self.__loginCheck(email, password)
-        session = self.Session()
-        auth = session.query(EmaliAuth).filter(EmaliAuth.email==email).first()
+        with self.__getSession() as session:
+            auth = session.query(EmaliAuth).filter(EmaliAuth.email==email).first()
         if not auth:
             raise Exception('邮箱未注册')
         hash = bcrypt.hashpw(password.encode(), auth.password.encode()).decode()
         if auth.password != hash:
             raise Exception('密码错误')
-        user = session.query(User).filter(User.uid == auth.uid).one()
-        user.last_login_time = now
-        session.add(user)
+        with self.__getSession() as session:
+            user = session.query(User).filter(User.uid == auth.uid).one()
+            user.last_login_time = now
+            session.add(user)
         info = {'email': email, 'uid': user.uid, 'username': user.username}
         token = Jwt.genToken(86400, info)
         info['token'] = token
