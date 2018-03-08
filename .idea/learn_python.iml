@@ -12,6 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/LoginSystem/static/js" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/base" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/thread" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gevent" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

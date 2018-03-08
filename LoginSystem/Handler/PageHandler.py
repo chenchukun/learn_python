@@ -9,6 +9,7 @@ class PageHandler(RequestHandler):
         if page not in self.pages:
             self.set_status(404)
             self.render('404.html')
+            self.finish()
         else:
             page = page if page != '' else 'search'
             token = self.get_cookie('token')
@@ -29,5 +30,6 @@ class PageHandler(RequestHandler):
             self.render('login.html')
         else:
             self.render('search.html')
+
 
 

@@ -40,6 +40,7 @@ class ApiHandler(RequestHandler):
 
     @asynchronous
     def post(self, req):
+        logging.info('post')
         if req not in self.postReqs:
             self.set_status(404)
             self.render('404.html')
@@ -100,7 +101,7 @@ class ApiHandler(RequestHandler):
         password = self.get_argument('password').strip()
         logging.info('register request: email = {}, username = {}, password = {} from {}'.format(email, username, password, self.request.remote_ip))
         self.__registerCheck(username, email, password)
-        hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt(4))
         uid = str(uuid.uuid1())
         now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         user = User(username=username, register_time=now, uid=uid)
