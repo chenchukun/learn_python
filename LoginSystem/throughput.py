@@ -54,5 +54,5 @@ def geventTest():
     ioloop.IOLoop.current().start()
 
 if __name__ == '__main__':
-#   threadTest()
-    geventTest()
+   threadTest()
+#    geventTest()
