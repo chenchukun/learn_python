@@ -1,4 +1,7 @@
 from functools import reduce
+from inspect import signature
+import operator
+from functools import partial
 
 # 函数也是对象，它有自己的属性，可以赋值，做函数参数或返回值
 def factorial(n):
@@ -55,3 +58,52 @@ print(callable(Fun))
 print(dir(factorial))
 # 用户自定义的属性
 print(factorial.__dict__)
+
+
+def fun(a, b, c=10, *d, **e):
+    x = a + b + c
+    return x
+
+# 函数参数个数，不包括* 和 **
+print(fun.__code__.co_argcount)
+# 前N个为函数参数，后面为函数内部定义的局部变量
+print(fun.__code__.co_varnames)
+# 函数参数默认值
+print(fun.__defaults__)
+
+# 通过inspect包可以方便的获取参数默认值
+sig = signature(fun)
+print(sig)
+
+for name, param in sig.parameters.items():
+    print(param.kind, ": ", name, " = ", param.default)
+
+
+# 可以给函数参数和函数返回值添加注解
+# 注解可以是类型或字符串，含有默认值的参数，注解存在参数可以=之间
+def max(a:int, b:int, p:'print'=False) -> int:
+    m = a if a>b else b
+    if p:
+        print(m)
+    return m
+
+# 注解保存在__annotations__属性中，除此之外不会做任何处理
+print(max.__annotations__)
+print(max(1, 2))
+
+
+# operator包提供了很多运算符的函数形式
+print(operator.mul(1, 2))
+
+# itemgetter(N)是一个可以用于返回序列中第N个元素的函数对象
+print(operator.itemgetter(2)(range(10)))
+# itemgetter的参数可以有多个，此时会返回一个元组
+print(operator.itemgetter(2, 5)(range(10)))
+
+d = {'a':1, 'b':2}
+# itemgetter使用[]，因此也支持字典和任何实现__getitem__的类型
+print(operator.itemgetter('a')(d))
+
+# 类型与C++中的bind
+mul10 = partial(operator.mul, 10)
+print(mul10(10))
