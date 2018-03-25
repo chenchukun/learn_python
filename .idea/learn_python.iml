@@ -14,6 +14,9 @@
       <sourceFolder url="file://$MODULE_DIR$/thread" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gevent" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/function" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tornado" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tornado/performance" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tornado/https" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
