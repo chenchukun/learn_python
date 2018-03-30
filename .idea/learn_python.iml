@@ -17,6 +17,8 @@
       <sourceFolder url="file://$MODULE_DIR$/tornado" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tornado/performance" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tornado/https" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grpc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grpc/echo" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
